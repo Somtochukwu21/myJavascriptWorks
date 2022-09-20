@@ -81,138 +81,165 @@ for (const arr of flattenedArray) {
 }
 
 // THE FOURTH ASSSIGNMENT CREATING A TODO LIST THAT UPDATES BY IT'S TITLE
+let todoList = [
+  {
+    Title: "First todo",
+    Date: "12/12/2024",
+    Done: true,
+  },
+  {
+    Title: "Second todo",
+    Date: "12/12/2024",
+    Done: true,
+  },
+  {
+    Title: "Third todo",
+    Date: "12/12/2024",
+    Done: false,
+  },
+  {
+    Title: "Fourth todo",
+    Date: "12/12/2024",
+    Done: false,
+  },
+];
 
-const items = [];
-
-function addToDo(item) {
-  // THIS CODE HERE MAKES SURE THAT ITEM PARAMETER IS AN OBJECT OR NOT EMPTY
-  if (typeof item !== "object" || !item) {
-    console.log("Sorry, but this format doesn't match our schema");
+function addToDO(list) {
+  // MAKING SURE THE PARAMETER IS NOT LEFT EMPTY OR NOT AN OBJECT
+  if (!list || typeof list !== "object") {
+    console.log("Title cannot be empty");
     return false;
-  } else if (
-    // THIS ONE IS TO CHECK FOR THE PROPERTIES OF THE ITEM PARAMETER TO KNOW IF IT HAS THE PROPERTIES HERE
-    !item.hasOwnProperty("Title") ||
-    !item.hasOwnProperty("Done") ||
-    !item.hasOwnProperty("Time")
+  }
+
+  // THIS MAKES SURE THAT THE TITLE PARAMETER ENTERED DOES NOT EXIST TWICE
+  for (const oldList of todoList) {
+    if (oldList.Title === list.Title) {
+      console.log(`Todo with title "${list.Title}" already exists`);
+      return false;
+    }
+  }
+
+  if (typeof list.Done !== "boolean") {
+    console.log("Boolean value expected");
+  }
+
+  // THIS CODE CHECKS IF THE NEW TO DO MATCHES THE SCHEMA
+  if (
+    !list.hasOwnProperty("Title") ||
+    !list.hasOwnProperty("Date") ||
+    !list.hasOwnProperty("Done")
   ) {
-    console.log("Something seems to be missing");
-    return false;
+    console.log("The added list doesn't match the Schema");
   }
 
-  // THIS ONE THROWS AN ERROR IF ACCCEPTED SCHEMA ARE NOT SEEN IN WHAT THE USER ENTERED
-  const acceptedItems = ["Title", "Done", "Time"];
+  //   THIS PUSHES THE PARAMETER OBJECT TO THE MAIN ARRAY OF OBJECT "toDoList"
+  todoList.push(list);
 
-  for (const props in item) {
-    if (!acceptedItems.includes(props)) {
-      console.log(`${props} not accepted`);
-      return false;
-    }
-  }
-
-  // THIS MAKES SURE THAT NONE OF THE STUDENTS HAS THE SAME NAME BUT IF THEY DO IT WILL THROW AN ERROR
-  for (const oldItem of items) {
-    if (oldItem.Title === item.Title) {
-      console.log(`Item with the title ${item.Title} already exists`);
-      return false;
-    }
-  }
-
-  items.push(item);
+  // AND NOW I RETURN THE PARAMETER
+  return list;
 }
 
+addToDO({
+  Title: "Fifth todo",
+  Done: true,
+  Date: "12/2/2021",
+});
+
+// FUNCTION THAT GETS THE TODO BY TITLE
+
 function getToDo(title) {
-  // THIS MAKES SURE THAT THE TITLE IS NOT EMPTY
+  // MAKING SURE THE PARAMETER IS NOT LEFT EMPTY OR NOT AN OBJECT
   if (!title) {
     console.log("Title cannot be empty");
     return false;
   }
 
-  // THIS ITERATES THROUHG THE ITEM AND MAKE SURE THAT THE TITLE PARAMETER IS THE SAME AS THE TITLE OF THE OBJECT
-  const findTitle = items.find((element) => element.Title.toLowerCase() === title.toLowerCase());
-
-  if (findTitle) {
-    for (const theTitle in findTitle) {
-      console.log(`${theTitle}:${findTitle[theTitle]}`);
+  // THIS MAKES SURE THAT THE TITLE PARAMETER ENTERED DOES NOT EXIST TWICE
+  for (const oldList of todoList) {
+    if (oldList.Title.toLowerCase() === title.toLowerCase()) {
+      console.log(oldList);
+      return oldList;
     }
-  } else {
-    console.log(`Item with the name ${title} not found`);
-    return false;
   }
 
+  // IF THE TODO WITH THE TITLE SPECIFIED IN THE PARAMETER IS NOT FOUND THEN THE console.LOG WILL LOG OUT THE INFO INIT
+
+  console.log(`${title} not found`);
+  return false;
 }
 
-function updateToDo(theTitle, myObj) {
-  // THIS MAKES SURE THAT THE TITLE IS NOT EMPTY
+// getToDo("Second todo");
 
-  if (!theTitle || !myObj) {
-    console.log("Title cannot be empty");
+// THIS FUNCTION AFTER GETTING THE TODO BY TITLE CAN UPDATE ANY PART OF IT
+function updateToDo(title, newToDo) {
+  // THIS CHECKS IF THERE'S NO NEW TODO OR THE TYPE IS NOT AN OBJECT. IF THE TYPE IS NOT AN OBJECT IT SHOULD CONSOLE THE MESSAGE THERE
+  if (!newToDo || typeof newToDo != "object") {
+    console.log("Enter new todo info");
     return false;
   }
 
+  // THIS MAPS THROUGH THE OBJECT
+  todoList = todoList.map((oldToDo) => {
+    // THIS CHECKS IF THE OLDTODO TITLE MATCHES WITH THE SPECIFIED PARAMETER FUNCTION\
+    if (oldToDo.Title.toLowerCase() === title.toLowerCase()) {
+      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS THE TITLE
+      if (newToDo.Title) {
+        // IF IT IS THE TITLE THAT WAS SPECIFIED THIS CODE NOW ASSIGNS THE NEW TODO TO THE OLDTODO
+        oldToDo.Title = newToDo.Title;
+        console.log(oldToDo);
+        return;
+      }
 
-  // THIS ITERATES THROUHG THE ITEM AND MAKE SURE THAT THE TITLE PARAMETER IS THE SAME AS THE TITLE OF THE OBJECT
-  
-  const gettingTitle = items.find((found) => found.Title.toLowerCase() === theTitle.toLowerCase());
-  
-  // THE IF STATEMENT ONLY WORKS WHEN THE PARAMETER MATCHES THE TITLE
-  if (gettingTitle) {
-  
-    for (const solution of items) {
-      for (const key in solution) {
-        if (key === myObj) {
-                if (myObj === "Done") {
-            solution[key]=false;
-          }
-        }
+      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS THE DATE
+      if (newToDo.Date) {
+        // IF IT IS THE DATE THAT WAS SPECIFIED THIS CODE NOW ASSIGNS THE NEW TODO TO THE OLDTODO
+        oldToDo.Date = newToDo.Date;
+        console.log(oldToDo);
+        return;
+      }
+
+      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS DONE THAT IS EQUAL TO TRUE
+
+      if (newToDo.Done === true) {
+        // IF THE STATEMENT IS TRUE THEN THE CODE EXECUTES?
+        oldToDo.Done = newToDo.Done;
+        console.log(oldToDo);
+        return;
+      }
+
+      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS DONE THAT IS EQUAL TO FALSE
+      if (newToDo.Done === false) {
+        // IF THE STATEMENT IS TRUE THEN THE CODE EXECUTES?
+        oldToDo.Done = newToDo.Done;
+        console.log(oldToDo);
+        return;
       }
     }
-  } else {
-    console.log(`Item with the name ${theTitle} not found`);
-    return false;
-  }
-
+    return oldToDo;
+  });
 }
 
-function deleteToDo(deletedTitle) {
-  if (!deletedTitle) {
-    console.log('Title can not be empty');
+// updateToDo("second todo", { Done: false });
+
+// FUNCTION THAT DELETES TODO
+function deleteToDo(title) {
+  // CHECKS IF THE TITLE IS EMPTY
+  if (!title) {
+    console.log("Title cannot be empty!");
     return false;
   }
-//   const deletedTitleItem=items.find((theDeletedTitle)=>theDeletedTitle.Title===deletedTitle)
-//  console.log(deletedTitleItem);
-
-
-for (const deletedItems of items) {
-  for (const key in deletedItems) {
-    if (deletedItems.hasOwnProperty.call(deletedItems, key)) {
-      const element = deletedItems[key];
-  
-      if (deletedTitle===element) {
-delete deletedItems[key];
-    }
-    }
+  if (title !== todoList.title) {
   }
- }
-
+  // FILTERS THROUGH THE ARRAY
+  todoList = todoList.filter((filtrate) => {
+    if (filtrate.Title.toLocaleLowerCase() !== title.toLocaleLowerCase()) {
+      return true;
+    }
+  });
 }
+deleteToDo("first todo");
 
-
-
-
-addToDo({
-  Title: "Sweep",
-  Time: "2hrs ago",
-  Done: true,
-});
-
-getToDo("sweep");
-
-updateToDo("Sweep", "Done");
-
-
-deleteToDo('2hrs ago');
-
-// console.log(items);
-
+// console.log('\n');
+console.log(todoList);
 
 
