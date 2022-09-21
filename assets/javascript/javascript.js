@@ -105,7 +105,7 @@ let todoList = [
 ];
 
 function addToDO(list) {
-  // MAKING SURE THE PARAMETER IS NOT LEFT EMPTY OR NOT AN OBJECT
+  // MAKING SURE THE PARAMETER IS NOT EMPTY OR NOT AN OBJECT
   if (!list || typeof list !== "object") {
     console.log("Title cannot be empty");
     return false;
