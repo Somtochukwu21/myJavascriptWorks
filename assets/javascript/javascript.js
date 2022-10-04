@@ -1,245 +1,172 @@
-// THE FIRST ASSIGNMENT TIME CONVERTANT
-function convertBetweenTime(time, from, to) {
-  time = Number(time);
-  if (isNaN(time)) {
-    console.error("Please enter a correct input");
-  }
+// THE FIFTH ASSIGNMENT
 
-  let secondsValue = 0;
+// the schema validation
+function SchemaValidation() {
+  this.successMessage = null;
+  this.errorMessage = null;
 
-  if (from === "ms") {
-    secondsValue = time / 1000;
-  }
+  // the rules of the validation
+  const rules = {
+    alphabet: /^[A-Za-z]+$/,
+    number: /^[0-9]+$/,
+    alphanumeric: /^[A-Za-z0-9\s]+$/,
+    char: /^[@.$A-Za-z0-9]+$/,
+  };
 
-  if (from === "s") {
-    secondsValue = time;
-  }
+  // the validate method
+  this.validate = function (
+    data,
+    rule,
+    message = "Sorry your data failed the validation"
+  ) {
+    const validatorRule = rules[rule];
 
-  if (from === "m") {
-    secondsValue = time * 60;
-  }
+    // check if the rule is found
+    if (!validatorRule) {
+      this.errorMessage = "Please check the rule you passed";
+      return false;
+    }
 
-  if (from === "hr") {
-    secondsValue = time * 3600;
-  }
+    // tests data to know if it matches with the rules
+    if (!validatorRule.test(data)) {
+      this.errorMessage = message;
+      return false;
+    }
 
-  let toValue = 0;
-
-  if (to === "ms") {
-    toValue = secondsValue * 1000;
-  }
-
-  if (to === "s") {
-    toValue = secondsValue;
-  }
-
-  if (to === "m") {
-    toValue = secondsValue / 60;
-  }
-
-  if (to === "hr") {
-    toValue = secondsValue / 3600;
-  }
-
-  return `${time} in ${from} is ${toValue} in ${to}`;
+    this.successMessage = "Data is valid";
+    this.errorMessage = null;
+    return true;
+  };
 }
 
-// console.log(convertBetweenTime(1, 'm', 's'));
+SchemaValidation.validateData = (data, keys) => {
+  /**@description Validates the presence of the keys */
+  // loops through the keys
+  for (const prop of keys) {
+    // passes theproperty of keys to a variable
+    const currentProp = data[prop];
 
-// THE SECOND ASSIGNMENT SETTING OF ALARM
-
-function setAlarm(time) {
-  if (isNaN(time)) {
-    console.error("Error at line 58");
-  }
-
-  const theHour = new Date().getHours();
-  const theMinutes = new Date().getMinutes();
-  if (theMinutes == time) {
-    console.log(`Wake up it's ${theHour}:${theMinutes}`);
-    clearInterval(createInterval);
-  }
-}
-
-const createInterval = setInterval(() => {
-  setAlarm(32);
-}, 1000);
-
-// THE THIRD ONE LOOP THROUGH NESTED ARRAYS
-
-let myArry = [
-  "Chevrolet",
-  "Mercedez",
-  "RangeRover",
-  ["Camaro", "GLK", ["Black", "White"]],
-];
-const flattenedArray = myArry.flat();
-for (const arr of flattenedArray) {
-  let gottenArry = [];
-  gottenArry += arr;
-  // console.log(gottenArry);
-}
-
-// THE FOURTH ASSSIGNMENT CREATING A TODO LIST THAT UPDATES BY IT'S TITLE
-let todoList = [
-  {
-    Title: "First todo",
-    Date: "12/12/2024",
-    Done: true,
-  },
-  {
-    Title: "Second todo",
-    Date: "12/12/2024",
-    Done: true,
-  },
-  {
-    Title: "Third todo",
-    Date: "12/12/2024",
-    Done: false,
-  },
-  {
-    Title: "Fourth todo",
-    Date: "12/12/2024",
-    Done: false,
-  },
-];
-
-function addToDO(list) {
-  // MAKING SURE THE PARAMETER IS NOT EMPTY OR NOT AN OBJECT
-  if (!list || typeof list !== "object") {
-    console.log("Title cannot be empty");
-    return false;
-  }
-
-  // THIS MAKES SURE THAT THE TITLE PARAMETER ENTERED DOES NOT EXIST TWICE
-  for (const oldList of todoList) {
-    if (oldList.Title === list.Title) {
-      console.log(`Todo with title "${list.Title}" already exists`);
+    // checks if there's no match between the keys and data entered
+    if (!currentProp) {
+      console.log(`${prop.toUpperCase()} is not found`);
       return false;
     }
   }
+  return true;
+};
 
-  if (typeof list.Done !== "boolean") {
-    console.log("Boolean value expected");
-  }
+const validator = new SchemaValidation(); //Instanciation
 
-  // THIS CODE CHECKS IF THE NEW TO DO MATCHES THE SCHEMA
-  if (
-    !list.hasOwnProperty("Title") ||
-    !list.hasOwnProperty("Date") ||
-    !list.hasOwnProperty("Done")
-  ) {
-    console.log("The added list doesn't match the Schema");
-  }
+const hall = [];
 
-  //   THIS PUSHES THE PARAMETER OBJECT TO THE MAIN ARRAY OF OBJECT "toDoList"
-  todoList.push(list);
+// just to make sure that hall with the same id doesn't exist twice
+const isExistingHall = (id) => {
+  const exist = hall.find((inventory) => {
+    return inventory.id == id;
+  });
 
-  // AND NOW I RETURN THE PARAMETER
-  return list;
+  return exist;
+};
+
+function CinemaHall() {
+  this.addData = (data = {}) => {
+    // check if all data is valid
+    const keys = ["id", "title", "price", "seats"];
+
+    if (!SchemaValidation.validateData(data, keys)) {
+      return false;
+    }
+
+    const ExistingHall = isExistingHall(data.id);
+    if (ExistingHall) {
+      console.log(`Inventory with ID = ${data.id} already exists`);
+      return false;
+    }
+    hall.push(data);
+  };
 }
 
-addToDO({
-  Title: "Fifth todo",
-  Done: true,
-  Date: "12/2/2021",
+const halls = new CinemaHall();
+halls.addData({
+  id: 1,
+  title: "Joker",
+  seats: 33,
+  price: 1,
 });
 
-// FUNCTION THAT GETS THE TODO BY TITLE
+halls.addData({
+  id: 2,
+  title: "The Boyz",
+  seats: 33,
+  price: 1,
+});
 
-function getToDo(title) {
-  // MAKING SURE THE PARAMETER IS NOT LEFT EMPTY OR NOT AN OBJECT
-  if (!title) {
-    console.log("Title cannot be empty");
-    return false;
-  }
+// console.log(hall);
 
-  // THIS MAKES SURE THAT THE TITLE PARAMETER ENTERED DOES NOT EXIST TWICE
-  for (const oldList of todoList) {
-    if (oldList.Title.toLowerCase() === title.toLowerCase()) {
-      console.log(oldList);
-      return oldList;
+const viewers = [];
+
+function ViewersData(purchases) {
+  this.viewersData = [];
+  ((_purchases) => {
+    const validator = new SchemaValidation(); //Instanciation
+    // check if all data is valid
+    const keys = ["hall_id", "seats", "price"];
+
+    if (!SchemaValidation.validateData(_purchases, keys)) {
+      return false;
     }
-  }
-
-  // IF THE TODO WITH THE TITLE SPECIFIED IN THE PARAMETER IS NOT FOUND THEN THE console.LOG WILL LOG OUT THE INFO INIT
-
-  console.log(`${title} not found`);
-  return false;
+    if (!validator.validate(_purchases.price, "char")) {
+      throw validator.errorMessage;
+      return false;
+    }
+    this.viewersData.push(_purchases);
+    viewers.push(_purchases);
+  })(purchases);
 }
 
-// getToDo("Second todo");
-
-// THIS FUNCTION AFTER GETTING THE TODO BY TITLE CAN UPDATE ANY PART OF IT
-function updateToDo(title, newToDo) {
-  // THIS CHECKS IF THERE'S NO NEW TODO OR THE TYPE IS NOT AN OBJECT. IF THE TYPE IS NOT AN OBJECT IT SHOULD CONSOLE THE MESSAGE THERE
-  if (!newToDo || typeof newToDo != "object") {
-    console.log("Enter new todo info");
-    return false;
-  }
-
-  // THIS MAPS THROUGH THE OBJECT
-  todoList = todoList.map((oldToDo) => {
-    // THIS CHECKS IF THE OLDTODO TITLE MATCHES WITH THE SPECIFIED PARAMETER FUNCTION\
-    if (oldToDo.Title.toLowerCase() === title.toLowerCase()) {
-      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS THE TITLE
-      if (newToDo.Title) {
-        // IF IT IS THE TITLE THAT WAS SPECIFIED THIS CODE NOW ASSIGNS THE NEW TODO TO THE OLDTODO
-        oldToDo.Title = newToDo.Title;
-        console.log(oldToDo);
-        return;
-      }
-
-      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS THE DATE
-      if (newToDo.Date) {
-        // IF IT IS THE DATE THAT WAS SPECIFIED THIS CODE NOW ASSIGNS THE NEW TODO TO THE OLDTODO
-        oldToDo.Date = newToDo.Date;
-        console.log(oldToDo);
-        return;
-      }
-
-      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS DONE THAT IS EQUAL TO TRUE
-
-      if (newToDo.Done === true) {
-        // IF THE STATEMENT IS TRUE THEN THE CODE EXECUTES?
-        oldToDo.Done = newToDo.Done;
-        console.log(oldToDo);
-        return;
-      }
-
-      // THIS CHECKS IF THE SPECIFIED OBJECT I.E THE SECOND PARAMETER IS DONE THAT IS EQUAL TO FALSE
-      if (newToDo.Done === false) {
-        // IF THE STATEMENT IS TRUE THEN THE CODE EXECUTES?
-        oldToDo.Done = newToDo.Done;
-        console.log(oldToDo);
-        return;
-      }
+function AddViewersData() {
+  this.add = (data = {}) => {
+    const ExistingHall = isExistingHall(data.hall_id);
+    if (!ExistingHall) {
+      console.log(`Sorry the hall with ID ${data.hall_id} does not exist`);
+      return false;
     }
-    return oldToDo;
-  });
+
+    ExistingHall.seats -= data.seats;
+    ExistingHall.price += data.price;
+
+    if (ExistingHall.seats < 0) {
+      ExistingHall.seats = null;
+      ExistingHall.price = null;
+
+      console.log(`Sorry there are no seats left in hall ${data.hall_id}`);
+      return false;
+    }
+
+    const CinemaViewersData = new ViewersData(data);
+    console.log(CinemaViewersData.viewersData);
+  };
 }
 
-// updateToDo("second todo", { Done: false });
+const viewersData = new AddViewersData();
 
-// FUNCTION THAT DELETES TODO
-function deleteToDo(title) {
-  // CHECKS IF THE TITLE IS EMPTY
-  if (!title) {
-    console.log("Title cannot be empty!");
-    return false;
-  }
-  if (title !== todoList.title) {
-  }
-  // FILTERS THROUGH THE ARRAY
-  todoList = todoList.filter((filtrate) => {
-    if (filtrate.Title.toLocaleLowerCase() !== title.toLocaleLowerCase()) {
-      return true;
-    }
-  });
-}
-deleteToDo("first todo");
+viewersData.add({
+  hall_id: 1,
+  seats: 26,
+  price: 26,
+});
 
-// console.log('\n');
-console.log(todoList);
+viewersData.add({
+  hall_id: 2,
+  seats: 2,
+  price: 2,
+});
 
+viewersData.add({
+  hall_id: 2,
+  seats: 24,
+  price: 24,
+});
 
+console.log(viewers);
+console.table(hall);
