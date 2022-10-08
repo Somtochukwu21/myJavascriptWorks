@@ -52,6 +52,12 @@ SchemaValidation.validateData = (data, keys) => {
       return false;
     }
   }
+
+  for (const key in data) {
+    if (!keys.includes(key)) {
+      throw `${key} does not exist `;
+    }
+  }
   return true;
 };
 
@@ -61,25 +67,22 @@ const hall = [];
 
 // just to make sure that hall with the same id doesn't exist twice
 const isExistingHall = (id) => {
-  const exist = hall.find((inventory) => {
-    return inventory.id == id;
+  return hall.find((hall) => {
+    return hall.id == id;
   });
-
-  return exist;
 };
 
 function CinemaHall() {
   this.addData = (data = {}) => {
     // check if all data is valid
     const keys = ["id", "title", "price", "seats"];
-
     if (!SchemaValidation.validateData(data, keys)) {
       return false;
     }
 
-    const ExistingHall = isExistingHall(data.id);
-    if (ExistingHall) {
-      console.log(`Inventory with ID = ${data.id} already exists`);
+    const existingHall = isExistingHall(data.id);
+    if (existingHall) {
+      console.log(`Hall with ID = ${data.id} already exists`);
       return false;
     }
     hall.push(data);
@@ -91,14 +94,14 @@ halls.addData({
   id: 1,
   title: "Joker",
   seats: 33,
-  price: 1,
+  price: 100,
 });
 
 halls.addData({
   id: 2,
   title: "The Boyz",
   seats: 33,
-  price: 1,
+  price: 100,
 });
 
 // console.log(hall);
@@ -110,63 +113,98 @@ function ViewersData(purchases) {
   ((_purchases) => {
     const validator = new SchemaValidation(); //Instanciation
     // check if all data is valid
-    const keys = ["hall_id", "seats", "price"];
+    const keys = ["id", "hall_id", "seats", "amount"];
 
     if (!SchemaValidation.validateData(_purchases, keys)) {
       return false;
     }
     if (!validator.validate(_purchases.price, "char")) {
       throw validator.errorMessage;
-      return false;
     }
     this.viewersData.push(_purchases);
     viewers.push(_purchases);
   })(purchases);
 }
 
+// just to make sure that viewers  with the same id doesn't exist twice
+const isViewerExist = (id) => {
+  return viewers.find((viewers) => {
+    return viewers.id === id;
+  });
+};
+const purchaseRecords = [];
+
 function AddViewersData() {
   this.add = (data = {}) => {
-    const ExistingHall = isExistingHall(data.hall_id);
-    if (!ExistingHall) {
+    const viewerId = isViewerExist(data.id);
+    if (viewerId) {
+      console.log(`Sorry a viewer has registered with the ID of ${data.id}`);
+      return false;
+    }
+
+    const existingHall = isExistingHall(data.hall_id);
+    if (!existingHall) {
       console.log(`Sorry the hall with ID ${data.hall_id} does not exist`);
       return false;
     }
 
-    ExistingHall.seats -= data.seats;
-    ExistingHall.price += data.price;
+    // make sure that viewer is not under paying or overpaying
+    const supposedAmount = data.seats * existingHall.price;
+    if (supposedAmount > data.amount) {
+      throw `Sorry we cannot process your order right now, you paid less  than required amount`;
+    }
 
-    if (ExistingHall.seats < 0) {
-      ExistingHall.seats = null;
-      ExistingHall.price = null;
+    if (supposedAmount < data.amount) {
+      throw `Sorry we cannot process your order right now, you paid more than required amount`;
+    }
 
+    if (existingHall.seats < 0) {
       console.log(`Sorry there are no seats left in hall ${data.hall_id}`);
       return false;
     }
 
-    const CinemaViewersData = new ViewersData(data);
-    console.log(CinemaViewersData.viewersData);
+    if (existingHall.seats < data.seats) {
+      console.log(`Sorry, we are only left with ${existingHall.seats} seats`);
+      return false;
+    }
+
+    existingHall.seats -= data.seats;
+    const cinemaViewersData = new ViewersData(data);
+    // create purchase record
+    const purchaseRecord = {
+      id: data.id,
+      hall_id: data.hall_id,
+      seats: data.seats,
+    };
+
+    purchaseRecords.push(purchaseRecord);
+    return cinemaViewersData;
   };
 }
 
 const viewersData = new AddViewersData();
-
 viewersData.add({
+  id: 1,
   hall_id: 1,
-  seats: 26,
-  price: 26,
+  seats: 4,
+  amount: 400,
 });
 
 viewersData.add({
+  id: 2,
   hall_id: 2,
   seats: 2,
-  price: 2,
+  amount: 200,
 });
 
 viewersData.add({
+  id: 3,
   hall_id: 2,
   seats: 24,
-  price: 24,
+  amount: 2400,
 });
 
-console.log(viewers);
+
 console.table(hall);
+console.table(viewers);
+console.table(purchaseRecords);
